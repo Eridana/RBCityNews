@@ -67,7 +67,7 @@
     loadMoreButton.center = footerView.center;
     [footerView addSubview:loadMoreButton];
     [self.tableView setTableFooterView:footerView];
-    self.tableView.tableFooterView.hidden = YES;
+    self.tableView.tableFooterView.hidden = NO;
 }
 
 - (NSMutableArray *)getSelectedCities
@@ -93,6 +93,8 @@
 
 - (void)loadMoreNews
 {
+    [self performSelectorOnMainThread:@selector(showActivityIndicator) withObject:nil waitUntilDone:YES];
+    
     NSLog(@"load more news...");
     for (City *city in [self getSelectedCities]) {
         int page = (int)[[pagesByCities objectForKey:city.city_id] integerValue];
@@ -102,9 +104,25 @@
     [apiManager loadNewsByCitiesAndPages:pagesByCities];
 }
 
-
+/*
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+    if(self.tableView.indexPathsForVisibleRows.count > 0) {
+        CGPoint offset = scrollView.contentOffset;
+        CGRect bounds = scrollView.bounds;
+        CGSize size = scrollView.contentSize;
+        UIEdgeInsets inset = scrollView.contentInset;
+        float y = offset.y + bounds.size.height - inset.bottom;
+        float h = size.height;
+        
+        float reload_distance = 50;
+        if(y > h + reload_distance) {
+            self.tableView.tableFooterView.hidden = NO;
+            NSLog(@"load more rows");
+        }
+    }
+    
+ 
     if(self.tableView.indexPathsForVisibleRows.count > 0) {
         NSInteger currentOffset = scrollView.contentOffset.y;
         NSInteger maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
@@ -114,13 +132,14 @@
         }
     }
 }
+*/
 
 #pragma mark - ApiManagerDelegate
 
 - (void)didReceiveNews:(NSMutableArray *)receivedNews
 {
+    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
     [self hideActivityIndicator];
-    [self.tableView reloadData];
 }
 
 - (void)loadNewsDidFailWithError:(NSString *)error
@@ -243,16 +262,23 @@
 }
 
 - (void)showActivityIndicatorWithStyle:(UIActivityIndicatorViewStyle)style {
-    CGRect frame = self.tableView.bounds;
+    CGRect frame = self.navigationController.view.bounds; //self.tableView.bounds;
     frame.origin.x = 0;
-    frame.origin.y = self.tableView.contentOffset.y;
+    frame.origin.y = self.navigationController.view.frame.origin.y;// self.tableView.contentOffset.y;
     
     UIView *view = [[UIView alloc] initWithFrame:frame];
     view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     view.backgroundColor = [UIColor groupTableViewBackgroundColor];
     view.layer.opacity = 1;
     view.tag = 1001;
-    [self.tableView addSubview:view];
+    CGRect viewFrame = self.navigationController.view.frame;
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(viewFrame.size.width/2 - 100, viewFrame.size.height/2 - 50, 200, 30)];
+    [label setTextColor:Rgb2UIColor(111, 123, 138)];
+    [label setTextAlignment:NSTextAlignmentCenter];
+    [label setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
+    label.text = @"Загрузка новостей...";
+    [view addSubview:label];
+    [self.navigationController.view insertSubview:view belowSubview:self.navigationController.navigationBar];
     
     UIActivityIndicatorView* indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:style];
     indicator.autoresizingMask =  UIViewAutoresizingFlexibleLeftMargin
@@ -262,13 +288,13 @@
     indicator.tag = 1002;
     indicator.center = view.center;
     [indicator startAnimating];
-    [self.tableView  addSubview:indicator];
+    [self.navigationController.view insertSubview:indicator belowSubview:self.navigationController.navigationBar];
 }
 
 - (void)hideActivityIndicator {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[self.tableView  viewWithTag:1001] removeFromSuperview];
-        [[self.tableView  viewWithTag:1002] removeFromSuperview];
+        [[self.navigationController.view  viewWithTag:1001] removeFromSuperview];
+        [[self.navigationController.view  viewWithTag:1002] removeFromSuperview];
     });
 }
 
