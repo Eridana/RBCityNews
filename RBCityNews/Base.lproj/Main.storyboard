@@ -42,7 +42,7 @@
                                             <color key="textColor" red="0.53725490196078429" green="0.7686274509803922" blue="0.95686274509803926" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Rr-6T-CPX">
+                                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Rr-6T-CPX">
                                             <rect key="frame" x="489" y="70" width="103" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="20" id="L0l-gO-uf2"/>
@@ -219,11 +219,13 @@
                                 </subviews>
                                 <color key="backgroundColor" red="0.77647058823529413" green="0.90196078431372551" blue="0.90588235294117647" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="79f-6L-hLK" secondAttribute="trailing" constant="8" id="2RR-rn-pd6"/>
-                                    <constraint firstItem="79f-6L-hLK" firstAttribute="top" secondItem="FaM-6d-fRI" secondAttribute="top" id="4kr-wU-oou"/>
-                                    <constraint firstAttribute="bottom" secondItem="79f-6L-hLK" secondAttribute="bottom" id="I9C-xe-y8g"/>
-                                    <constraint firstItem="79f-6L-hLK" firstAttribute="leading" secondItem="FaM-6d-fRI" secondAttribute="leading" constant="8" id="MPB-5b-vCP"/>
+                                    <constraint firstAttribute="bottom" secondItem="79f-6L-hLK" secondAttribute="bottom" id="7Sf-i8-MK3"/>
+                                    <constraint firstAttribute="centerY" secondItem="79f-6L-hLK" secondAttribute="centerY" id="I4U-Gl-Yxi"/>
+                                    <constraint firstAttribute="centerX" secondItem="79f-6L-hLK" secondAttribute="centerX" id="NSH-Q7-ejf"/>
                                     <constraint firstAttribute="height" constant="73" id="TZ1-0Y-TLw"/>
+                                    <constraint firstItem="79f-6L-hLK" firstAttribute="top" secondItem="FaM-6d-fRI" secondAttribute="top" id="km8-1N-p0C"/>
+                                    <constraint firstAttribute="trailing" secondItem="79f-6L-hLK" secondAttribute="trailing" constant="8" id="xXi-8t-TaW"/>
+                                    <constraint firstItem="79f-6L-hLK" firstAttribute="leading" secondItem="FaM-6d-fRI" secondAttribute="leading" constant="8" id="zXs-Xg-hhx"/>
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="дата" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l2E-oa-FJ3">
@@ -305,6 +307,7 @@
                         <outlet property="dateLabel" destination="l2E-oa-FJ3" id="ShV-5D-Ed4"/>
                         <outlet property="detailTitle" destination="79f-6L-hLK" id="PVn-AK-91H"/>
                         <outlet property="summary" destination="9SE-rx-kVL" id="chF-bV-7ZS"/>
+                        <outlet property="titleViewHeight" destination="TZ1-0Y-TLw" id="1gY-Mn-fwG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iXy-66-aaz" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -14,6 +14,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UITextView *summary;
 @property (weak, nonatomic) IBOutlet UILabel *cityLabel;
+// constraints
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *titleViewHeight;
+
 @property(strong, nonatomic) News *details;
 
 -(void)setDetails:(News *)details;
