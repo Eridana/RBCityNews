@@ -20,5 +20,6 @@
 @property (strong, nonatomic) NSString *legacy_url;
 @property (strong, nonatomic) NSDate *date;
 @property (strong, nonatomic) NSString *dateAsString;
+@property (assign, nonatomic) BOOL isNotRead;
 
 @end

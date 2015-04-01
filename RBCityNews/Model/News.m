@@ -11,35 +11,6 @@
 
 @implementation News
 
--(void)setSummary:(NSString *)summary
-{
-    @try {
-        _summary = [self stringByStrippingHTML:summary];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"%@", exception.reason);
-    }
-    @finally {
-        _summary = summary;
-    }
-}
-
-- (NSString *)stringByStrippingHTML:(NSString *)htmlString
-{
-    NSString *newString = nil;
-    newString = [htmlString stringByReplacingOccurrencesOfString:@"<br>" withString:@"\n"];
-    newString = [htmlString stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@"\n"];
-    newString = [newString stringByReplacingOccurrencesOfString:@"&lt;" withString:@"<"];
-    newString = [newString stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
-    newString = [newString stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
-    
-    NSRange range;
-    NSString *str = [newString copy];
-    while ((range = [str rangeOfString:@"<[^>]+>" options:NSRegularExpressionSearch]).location != NSNotFound)
-        str = [str stringByReplacingCharactersInRange:range withString:@""];
-    return str;
-}
-
 - (void)setPublished_at:(NSString *)published_at
 {
     NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
@@ -51,6 +22,7 @@
     [dateFormatter setLocale:locale];
     [dateFormatter setDateStyle:NSDateFormatterLongStyle];
     [dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
+    dateFormatter.doesRelativeDateFormatting = YES;
     _dateAsString = [dateFormatter stringFromDate:_date];
 }
 
