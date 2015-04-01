@@ -54,6 +54,9 @@ const CGFloat initialTitleViewHeight = 73;
     if(_details.city) {
         [self.cityLabel setText:_details.city.name];
     }
+    if(_details.isNotRead == YES) {
+        _details.isNotRead = NO;
+    }
 }
                            
 - (CGFloat)heightForLabel:(UILabel *)label withText:(NSString *)text{
@@ -88,19 +91,19 @@ const CGFloat initialTitleViewHeight = 73;
 
 - (IBAction)loadNext:(UISwipeGestureRecognizer *)gesture
 {
-    if(currentNewsIndex ==  [displayNews count] - 1) {
+    currentNewsIndex++;
+    if(currentNewsIndex ==  [displayNews count]) {
         currentNewsIndex = 0;
     }
-    currentNewsIndex++;
     [self loadNewsForIndex:currentNewsIndex];
 }
 
 - (IBAction)loadPrev:(UISwipeGestureRecognizer *)gesture
 {
-    if(currentNewsIndex ==  0) {
+    currentNewsIndex--;
+    if(currentNewsIndex == -1) {
         currentNewsIndex = [displayNews count] - 1;
     }
-    currentNewsIndex--;
     [self loadNewsForIndex:currentNewsIndex];
 }
 
