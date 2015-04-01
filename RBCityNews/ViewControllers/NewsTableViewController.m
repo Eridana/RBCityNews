@@ -9,19 +9,20 @@
 #import "NewsTableViewController.h"
 #import "NewsTableViewCell.h"
 #import "NewsDetailViewController.h"
-//#import "UIView+ActivityIndicator.h"
 #import "NewsHelper.h"
 #import "Settings.h"
 
 #define Rgb2UIColor(r, g, b)  [UIColor colorWithRed:((r) / 255.0) green:((g) / 255.0) blue:((b) / 255.0) alpha:1.0]
+NSString * const keyLastUpdated = @"lastUpdated";
 
 @interface NewsTableViewController ()
 {
+    NSString *lastUpdatedDateString;
     UIView *footerView;
-    UIRefreshControl *refreshControl;
     NSMutableDictionary *pagesByCities;
     News *selectedNews;
     ApiManager *apiManager;
+    NSDateFormatter *formatter;
 }
 @end
 
@@ -30,23 +31,32 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+    
     pagesByCities = [[NSMutableDictionary alloc] init];
     NSArray *cities = [Settings sharedInstance].allCities;
     for (City *city in cities) {
         [pagesByCities setObject:@(1) forKey:city.city_id];
     }
     
-    refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:@""];
-    [refreshControl addTarget:self action:@selector(loadAdditionalNews) forControlEvents:UIControlEventValueChanged];
-    [self.tableView addSubview:refreshControl];
     [self addFooterToTableView];
     
     apiManager = [[ApiManager alloc] init];
     apiManager.apiDelegate = self;
     [self showActivityIndicator];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [apiManager loadNewsByCitiesAndPages:pagesByCities];
+    [self setLastUpdatedDate:[NSDate date]];
     self.clearsSelectionOnViewWillAppear = NO;
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+    if(indexPath) {
+        [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -70,6 +80,26 @@
     self.tableView.tableFooterView.hidden = NO;
 }
 
+- (NSString *)getLastUpdatedDateString
+{
+    NSString *lastUpdated = [[NSUserDefaults standardUserDefaults] objectForKey:keyLastUpdated];
+    if (lastUpdated != nil && lastUpdated != (id)[NSNull null] && lastUpdated.length > 0) {
+        return lastUpdated;
+    }
+    else {
+       NSDate *date = [NSDate date];
+       lastUpdated = [formatter stringFromDate:date];
+    }
+    return lastUpdated;
+}
+
+- (void)setLastUpdatedDate:(NSDate *)date
+{
+     NSString *lastUpdated = [formatter stringFromDate:date];
+    [[NSUserDefaults standardUserDefaults] setObject:lastUpdated forKey:keyLastUpdated];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (NSMutableArray *)getSelectedCities
 {
     return [[Settings sharedInstance] getSelectedCities];
@@ -81,27 +111,32 @@
     return [city city_id];
 }
 
-- (void)loadAdditionalNews
+- (IBAction)refreshNews:(id)sender
 {
-    NSMutableDictionary *pages = [[NSMutableDictionary alloc] init];
-    NSArray *cities = [Settings sharedInstance].allCities;
-    for (City *city in cities) {
-        [pagesByCities setObject:@(1) forKey:city.city_id];
-    }
-    [apiManager loaAdditionsldNewsByCitiesAndPages:pages];
+    [apiManager loadAdditionalNewsByDateString:[self getLastUpdatedDateString]];
 }
 
 - (void)loadMoreNews
 {
-    [self performSelectorOnMainThread:@selector(showActivityIndicator) withObject:nil waitUntilDone:YES];
-    
-    NSLog(@"load more news...");
+    //[self performSelectorOnMainThread:@selector(showActivityIndicator) withObject:nil waitUntilDone:YES];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     for (City *city in [self getSelectedCities]) {
         int page = (int)[[pagesByCities objectForKey:city.city_id] integerValue];
         page++;
         [pagesByCities setObject:[NSNumber numberWithInt:page] forKey:city.city_id];
     }
     [apiManager loadNewsByCitiesAndPages:pagesByCities];
+}
+
+- (UIColor *)lighterColorForColor:(UIColor *)c
+{
+    CGFloat r, g, b, a;
+    if ([c getRed:&r green:&g blue:&b alpha:&a])
+        return [UIColor colorWithRed:MIN(r + 0.05, 1.0)
+                               green:MIN(g + 0.05, 1.0)
+                                blue:MIN(b + 0.05, 1.0)
+                               alpha:a];
+    return nil;
 }
 
 /*
@@ -138,32 +173,73 @@
 
 - (void)didReceiveNews:(NSMutableArray *)receivedNews
 {
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
     [self hideActivityIndicator];
 }
 
 - (void)loadNewsDidFailWithError:(NSString *)error
 {
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self hideActivityIndicator];
     NSLog(@"NewsTableViewController loadNewsDidFailWithError: %@", error);
 }
 
 - (void)didNotReceiveAdditionalNews
 {
-    [refreshControl endRefreshing];
+    if ([self.refreshControl isRefreshing] == YES) {
+        [self.refreshControl endRefreshing];
+    }
 }
 
-- (void)didReceiveAdditionalNews
+- (void)didReceiveAdditionalNews:(NSMutableArray *)receivedNews
 {
-    [refreshControl endRefreshing];
-    [self.tableView reloadData];
+    if ([self.refreshControl isRefreshing] == YES) {
+        [self.refreshControl endRefreshing];
+        /*
+        [NSTimer scheduledTimerWithTimeInterval:30.0
+                                         target:self
+                                       selector:@selector(hideColors)
+                                       userInfo:nil
+                                        repeats:NO];
+        */
+    }
+    [self setLastUpdatedDate:[NSDate date]];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSMutableArray *indicesToAdd = [[NSMutableArray alloc] init];
+        [self.tableView beginUpdates];
+        for (int i = 0; i < receivedNews.count; i++) {
+            News* news = receivedNews[i];
+            int section = (int)[[self getSelectedCities] indexOfObject:news.city];
+            NSIndexPath *indexpath = [NSIndexPath indexPathForRow:i inSection:section];
+            [indicesToAdd addObject: indexpath];
+        }
+        [self.tableView insertRowsAtIndexPaths:indicesToAdd withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+        [self.tableView reloadData];
+    });
+}
+
+- (void)hideColors
+{
+    NSLog(@"hideColors");
+    for (City *city in [Settings sharedInstance].allCities) {
+        NSMutableArray *news = [[NewsHelper sharedInstance].newsByCities objectForKey:city.city_id];
+        for (News *new in news) {
+            new.isNotRead = NO;
+        }
+    }
+    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark - SettingsDelegate
 
 - (void)citiesDidChange
 {
-     [apiManager loadNewsByCitiesAndPages:pagesByCities];
+    NSLog(@"cities did change");
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [apiManager loadNewsByCitiesAndPages:pagesByCities];
 }
 
 #pragma mark - Table view data source
@@ -187,7 +263,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NewsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"newsCell" forIndexPath:indexPath];
-    [cell setCellData:[[self getNewsBySection:indexPath.section] objectAtIndex:indexPath.row]];
+    News *cellNew = [[self getNewsBySection:indexPath.section] objectAtIndex:indexPath.row];
+    //[cellNew addObserver:cell forKeyPath:@"isNotRead" options:NSKeyValueObservingOptionNew context:nil];
+    [cell setCellData:cellNew];
     return cell;
 }
 
@@ -252,6 +330,12 @@
     if ([segue.identifier isEqualToString:@"showDetails"]) {
         NewsDetailViewController *newsDetail = segue.destinationViewController;
         [newsDetail setDetails:selectedNews];
+    }
+    else if ([segue.identifier isEqualToString:@"selectCities"]) {
+        SettingsTableViewController *svc = segue.destinationViewController;
+        if (svc.settingsDelegate == nil) {
+            svc.settingsDelegate = self;
+        }
     }
 }
 
