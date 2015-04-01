@@ -74,8 +74,6 @@ NSString * const keyLastUpdated = @"lastUpdated";
     [loadMoreButton setTintColor:Rgb2UIColor(111, 123, 138)];
     [loadMoreButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [loadMoreButton.titleLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
-    [loadMoreButton.layer setCornerRadius:0.2];
-    [loadMoreButton.layer setBorderColor:Rgb2UIColor(111, 123, 138).CGColor];
     [loadMoreButton addTarget:self action:@selector(loadMoreNews) forControlEvents:UIControlEventTouchUpInside];
     [loadMoreButton setFrame:CGRectMake(0, 0, self.view.frame.size.width, 60.0)];
     loadMoreButton.center = footerView.center;
