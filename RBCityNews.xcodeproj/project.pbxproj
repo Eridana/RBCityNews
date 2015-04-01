@@ -45,6 +45,7 @@
 		3F23034D1AA0F9180084C5C6 /* button_web@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F2303461AA0F9180084C5C6 /* button_web@2x.png */; };
 		3F6A160F1ACA7CC6006ED62C /* NetworkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A160C1ACA7CC6006ED62C /* NetworkManager.m */; };
 		3F6A16101ACA7CC6006ED62C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A160E1ACA7CC6006ED62C /* Reachability.m */; };
+		3F6A16131ACAAFA2006ED62C /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A16111ACAAFA2006ED62C /* NSString+HTML.m */; };
 		3F77A4631ABAA344003CE89B /* NewsTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F77A4621ABAA344003CE89B /* NewsTableViewCell.m */; };
 		3F77A4681ABAA3CC003CE89B /* ApiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F77A4671ABAA3CC003CE89B /* ApiManager.m */; };
 		3F77A46D1ABAA3EB003CE89B /* News.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F77A46A1ABAA3EB003CE89B /* News.m */; };
@@ -129,6 +130,8 @@
 		3F6A160C1ACA7CC6006ED62C /* NetworkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkManager.m; sourceTree = "<group>"; };
 		3F6A160D1ACA7CC6006ED62C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		3F6A160E1ACA7CC6006ED62C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		3F6A16111ACAAFA2006ED62C /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
+		3F6A16121ACAAFA2006ED62C /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
 		3F77A4611ABAA344003CE89B /* NewsTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsTableViewCell.h; sourceTree = "<group>"; };
 		3F77A4621ABAA344003CE89B /* NewsTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsTableViewCell.m; sourceTree = "<group>"; };
 		3F77A4661ABAA3CC003CE89B /* ApiManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApiManager.h; sourceTree = "<group>"; };
@@ -323,6 +326,8 @@
 		3F6A160A1ACA7CBB006ED62C /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				3F6A16111ACAAFA2006ED62C /* NSString+HTML.m */,
+				3F6A16121ACAAFA2006ED62C /* NSString+HTML.h */,
 				3F6A160B1ACA7CC6006ED62C /* NetworkManager.h */,
 				3F6A160C1ACA7CC6006ED62C /* NetworkManager.m */,
 				3F6A160D1ACA7CC6006ED62C /* Reachability.h */,
@@ -506,6 +511,7 @@
 				3F03E0C21AC577CA003769C3 /* SVModalWebViewController.m in Sources */,
 				3F03E0C41AC577CA003769C3 /* SVWebViewController.m in Sources */,
 				3F77A4631ABAA344003CE89B /* NewsTableViewCell.m in Sources */,
+				3F6A16131ACAAFA2006ED62C /* NSString+HTML.m in Sources */,
 				3F23031F1AA0F4530084C5C6 /* NewsTableViewController.m in Sources */,
 				3F77A4711ABAA479003CE89B /* UIView+ActivityIndicator.m in Sources */,
 				3F2302FC1AA0F38E0084C5C6 /* AppDelegate.m in Sources */,
