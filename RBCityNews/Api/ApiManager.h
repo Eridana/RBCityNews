@@ -17,9 +17,9 @@
 @property id<ApiManagerDelegate> apiDelegate;
 
 - (void)loadNewsByCitiesAndPages:(NSMutableDictionary *)pagesByCities;
-- (void)loaAdditionsldNewsByCitiesAndPages:(NSMutableDictionary *)pagesByCities;
+- (void)loadAdditionalNewsByCitiesAndPages:(NSMutableDictionary *)pagesByCities;
 - (void)loadNewsByCity:(City *)city andPage:(int)page;
-- (void)loadNewsByDate:(NSDate *)date;
+- (void)loadAdditionalNewsByDateString:(NSString *)dateString;
 
 @end
 
@@ -27,5 +27,5 @@
 - (void)didReceiveNews:(NSMutableArray *)receivedNews;
 - (void)loadNewsDidFailWithError:(NSString *)error;
 - (void)didNotReceiveAdditionalNews;
-- (void)didReceiveAdditionalNews;
+- (void)didReceiveAdditionalNews:(NSMutableArray *)receivedNews;
 @end
