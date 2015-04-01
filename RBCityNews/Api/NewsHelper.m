@@ -49,6 +49,14 @@
     }
 }
 
+- (void)sortNewsByDate
+{
+    for (City *city in [Settings sharedInstance].allCities) {
+        NSMutableArray *array = [_newsByCities objectForKey:city.city_id];
+        array = [self sortNewsByDate:array];
+    }
+}
+
 - (NSMutableArray *)sortNewsByDate:(NSMutableArray *)array
 {
     NSSortDescriptor *dateDescriptor = [NSSortDescriptor
@@ -60,7 +68,18 @@
 
 - (void)setAdditionalNews:(NSArray *)news
 {
-    [self setNews:news];
+    for (int i = 0; i < news.count; i++) {
+        News *new = news[i];
+        if ([self containsNews:new] == NO) {
+            if (new.city != nil) {
+                City *city = new.city;
+                NSMutableArray *array = [_newsByCities objectForKey:city.city_id];
+                if (array != nil) {
+                    [array insertObject:new atIndex:i];
+                }
+            }
+        }
+    }
 }
 
 - (NSArray *)getNewsByCity:(City *)city
