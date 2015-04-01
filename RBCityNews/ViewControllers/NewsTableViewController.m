@@ -23,6 +23,7 @@ NSString * const keyLastUpdated = @"lastUpdated";
     News *selectedNews;
     ApiManager *apiManager;
     NSDateFormatter *formatter;
+    UIButton *loadMoreButton;
 }
 @end
 
@@ -51,8 +52,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
     self.clearsSelectionOnViewWillAppear = NO;
 }
 
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
     NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
     if(indexPath) {
         [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -67,11 +69,13 @@ NSString * const keyLastUpdated = @"lastUpdated";
 - (void)addFooterToTableView
 {
     footerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, 60.0)];
-    UIButton *loadMoreButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    loadMoreButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [loadMoreButton setTitle: @"Загрузить еще новости" forState:UIControlStateNormal];
     [loadMoreButton setTintColor:Rgb2UIColor(111, 123, 138)];
     [loadMoreButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
     [loadMoreButton.titleLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
+    [loadMoreButton.layer setCornerRadius:0.2];
+    [loadMoreButton.layer setBorderColor:Rgb2UIColor(111, 123, 138).CGColor];
     [loadMoreButton addTarget:self action:@selector(loadMoreNews) forControlEvents:UIControlEventTouchUpInside];
     [loadMoreButton setFrame:CGRectMake(0, 0, self.view.frame.size.width, 60.0)];
     loadMoreButton.center = footerView.center;
@@ -118,8 +122,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
 
 - (void)loadMoreNews
 {
-    //[self performSelectorOnMainThread:@selector(showActivityIndicator) withObject:nil waitUntilDone:YES];
+    loadMoreButton.enabled = NO;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
     for (City *city in [self getSelectedCities]) {
         int page = (int)[[pagesByCities objectForKey:city.city_id] integerValue];
         page++;
@@ -173,6 +178,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
 
 - (void)didReceiveNews:(NSMutableArray *)receivedNews
 {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        loadMoreButton.enabled = YES;
+    });
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
     [self hideActivityIndicator];
@@ -180,6 +188,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
 
 - (void)loadNewsDidFailWithError:(NSString *)error
 {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        loadMoreButton.enabled = YES;
+    });
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self hideActivityIndicator];
     NSLog(@"NewsTableViewController loadNewsDidFailWithError: %@", error);
@@ -302,17 +313,6 @@ NSString * const keyLastUpdated = @"lastUpdated";
     return 30;
 }
 
-/*
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    //last section
-    if (indexPath.section == [self getSelectedCities].count - 1) {
-        if ([self getNewsBySection:indexPath.section].count == (indexPath.row + 1)) {
-            tableView.tableFooterView.hidden = NO;
-        }
-    }
-}*/
-
 #pragma mark - Navigation
 
 - (IBAction)readMorePressed:(id)sender
@@ -346,9 +346,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
 }
 
 - (void)showActivityIndicatorWithStyle:(UIActivityIndicatorViewStyle)style {
-    CGRect frame = self.navigationController.view.bounds; //self.tableView.bounds;
+    CGRect frame = self.navigationController.view.bounds;
     frame.origin.x = 0;
-    frame.origin.y = self.navigationController.view.frame.origin.y;// self.tableView.contentOffset.y;
+    frame.origin.y = self.navigationController.view.frame.origin.y;
     
     UIView *view = [[UIView alloc] initWithFrame:frame];
     view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
