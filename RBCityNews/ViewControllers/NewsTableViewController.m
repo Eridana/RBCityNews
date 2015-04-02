@@ -126,6 +126,7 @@ NSString * const keyLastUpdated = @"lastUpdated";
     label.lineBreakMode = NSLineBreakByWordWrapping;
     [label setTextColor:Rgb2UIColor(111, 123, 138)];
     label.clipsToBounds = YES;
+    [label setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     [noInternetConnectionView addSubview:label];
     /*
     if (IS_OS_8_OR_LATER) {
@@ -375,7 +376,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
     City *city = [[self getSelectedCities] objectAtIndex:section];
     [label setText:city.name];
     label.center = view.center;
+    [label setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     [view addSubview:label];
+    [view setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     return view;
 }
 
@@ -428,6 +431,10 @@ NSString * const keyLastUpdated = @"lastUpdated";
     view.tag = 1001;
     CGRect viewFrame = self.navigationController.view.frame;
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(viewFrame.size.width/2 - 100, viewFrame.size.height/2 - 50, 200, 30)];
+    label.autoresizingMask =  UIViewAutoresizingFlexibleLeftMargin
+    | UIViewAutoresizingFlexibleRightMargin
+    | UIViewAutoresizingFlexibleTopMargin
+    | UIViewAutoresizingFlexibleBottomMargin;
     [label setTextColor:Rgb2UIColor(111, 123, 138)];
     [label setTextAlignment:NSTextAlignmentCenter];
     [label setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:15]];
