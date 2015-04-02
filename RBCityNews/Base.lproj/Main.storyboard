@@ -58,7 +58,7 @@
                                             </connections>
                                         </button>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Заголовок" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yEq-o1-gt3">
-                                            <rect key="frame" x="14" y="26" width="578" height="44"/>
+                                            <rect key="frame" x="14" y="26" width="575" height="44"/>
                                             <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
                                             <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
@@ -87,6 +87,7 @@
                                         <constraint firstItem="Fhz-pU-Ig0" firstAttribute="top" secondItem="LqA-78-8Ro" secondAttribute="topMargin" constant="-8" id="LUG-Sb-7PP"/>
                                         <constraint firstItem="YL0-CG-M6c" firstAttribute="bottom" secondItem="LqA-78-8Ro" secondAttribute="bottomMargin" id="R2g-a9-qg0"/>
                                         <constraint firstItem="Zuj-sZ-IG0" firstAttribute="leading" secondItem="LqA-78-8Ro" secondAttribute="leadingMargin" constant="-8" id="RHG-7n-07D"/>
+                                        <constraint firstItem="Fhz-pU-Ig0" firstAttribute="leading" secondItem="yEq-o1-gt3" secondAttribute="trailing" constant="1" id="S4f-5w-YRw"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="Zuj-sZ-IG0" secondAttribute="trailing" constant="-8" id="Vs1-os-Hrt"/>
                                         <constraint firstItem="YL0-CG-M6c" firstAttribute="leading" secondItem="LqA-78-8Ro" secondAttribute="leadingMargin" constant="6" id="X9w-I5-pOV"/>
                                         <constraint firstItem="0ds-o7-0Nz" firstAttribute="top" secondItem="LqA-78-8Ro" secondAttribute="topMargin" id="agJ-1V-erK"/>
@@ -98,7 +99,6 @@
                                         <constraint firstItem="YL0-CG-M6c" firstAttribute="top" secondItem="yEq-o1-gt3" secondAttribute="bottom" id="tbR-2U-Meh"/>
                                         <constraint firstItem="JgE-OY-CBp" firstAttribute="centerY" secondItem="0ds-o7-0Nz" secondAttribute="centerY" id="tr9-ju-82N"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="3Rr-6T-CPX" secondAttribute="trailing" id="vVZ-45-xHM"/>
-                                        <constraint firstItem="yEq-o1-gt3" firstAttribute="trailing" secondItem="LqA-78-8Ro" secondAttribute="trailingMargin" id="zdO-fC-SSH"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="Fhz-pU-Ig0" secondAttribute="bottom" constant="-8" id="zhe-gF-eSf"/>
                                     </constraints>
                                 </tableViewCellContentView>
@@ -250,7 +250,7 @@
                                     <constraint firstAttribute="height" constant="35" id="HHi-sv-XAe"/>
                                     <constraint firstAttribute="width" constant="194" id="q7s-xw-z4W"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="16"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
                                 <state key="normal" title="Еще подробности" backgroundImage="button_web.png">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>

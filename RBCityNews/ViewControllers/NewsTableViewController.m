@@ -10,8 +10,10 @@
 #import "NewsTableViewCell.h"
 #import "NewsDetailViewController.h"
 #import "NewsHelper.h"
+#import "NetworkManager.h"
 #import "Settings.h"
 
+#define IS_OS_8_OR_LATER    ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 #define Rgb2UIColor(r, g, b)  [UIColor colorWithRed:((r) / 255.0) green:((g) / 255.0) blue:((b) / 255.0) alpha:1.0]
 NSString * const keyLastUpdated = @"lastUpdated";
 
@@ -24,6 +26,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
     ApiManager *apiManager;
     NSDateFormatter *formatter;
     UIButton *loadMoreButton;
+    UIView *noInternetConnectionView;
+    NSMutableArray *indexPathsForResresh;
+    NSTimer *timer;
 }
 @end
 
@@ -32,9 +37,11 @@ NSString * const keyLastUpdated = @"lastUpdated";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+    indexPathsForResresh = [[NSMutableArray alloc] init];
     
+    formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+
     pagesByCities = [[NSMutableDictionary alloc] init];
     NSArray *cities = [Settings sharedInstance].allCities;
     for (City *city in cities) {
@@ -45,20 +52,39 @@ NSString * const keyLastUpdated = @"lastUpdated";
     
     apiManager = [[ApiManager alloc] init];
     apiManager.apiDelegate = self;
-    [self showActivityIndicator];
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    [apiManager loadNewsByCitiesAndPages:pagesByCities];
-    [self setLastUpdatedDate:[NSDate date]];
+    
+    if ([[NetworkManager sharedInstance] isConnectionAvailable]) {
+        [self loadNews];
+        //[self setLastUpdatedDate:[NSDate date]];
+    }
+    else {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(loadNews)
+                                                     name:kConnectionIsAvailableNotificationName
+                                                   object:nil];
+        [self addNoInternetConnectionView];
+    }
+    
     self.clearsSelectionOnViewWillAppear = NO;
 }
 
--(void)viewDidDisappear:(BOOL)animated
+- (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
     if(indexPath) {
         [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
+}
+
+- (void)dealloc
+{
+    [self removeNotifications];
+}
+
+- (void)removeNotifications
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -82,24 +108,64 @@ NSString * const keyLastUpdated = @"lastUpdated";
     self.tableView.tableFooterView.hidden = NO;
 }
 
-- (NSString *)getLastUpdatedDateString
+- (void)addNoInternetConnectionView
 {
-    NSString *lastUpdated = [[NSUserDefaults standardUserDefaults] objectForKey:keyLastUpdated];
-    if (lastUpdated != nil && lastUpdated != (id)[NSNull null] && lastUpdated.length > 0) {
-        return lastUpdated;
+    CGRect frame = self.navigationController.view.bounds;
+    frame.origin.x = 0;
+    frame.origin.y = self.navigationController.view.frame.origin.y;
+    
+    noInternetConnectionView = [[UIView alloc] initWithFrame:frame];
+    noInternetConnectionView.backgroundColor = [UIColor whiteColor];
+    
+    CGRect viewFrame = self.navigationController.view.frame;
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(viewFrame.size.width/2 - 125, viewFrame.size.height/2 - 100, 250, 80)];
+    [label setTextAlignment:NSTextAlignmentCenter];
+    [label setFont:[UIFont fontWithName:@"HelveticaNeue" size:15]];
+    label.text = @"Не найдено активное соединение с интернетом.";
+    label.numberOfLines = 0;
+    label.lineBreakMode = NSLineBreakByWordWrapping;
+    [label setTextColor:Rgb2UIColor(111, 123, 138)];
+    label.clipsToBounds = YES;
+    [noInternetConnectionView addSubview:label];
+    /*
+    if (IS_OS_8_OR_LATER) {
+        UIButton *goToSettings = [UIButton buttonWithType:UIButtonTypeSystem];
+        [goToSettings setFrame:CGRectMake(0, 0, 194, 40)];
+        [goToSettings setBackgroundImage:[UIImage imageNamed:@"button_web.png"] forState:UIControlStateNormal];
+        [goToSettings setTitle: @"Перейти в настройки" forState:UIControlStateNormal];
+        [goToSettings setTintColor:[UIColor whiteColor]];
+        [goToSettings.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [goToSettings.titleLabel setFont:[UIFont fontWithName:@"HelveticaNeue" size:15]];
+        [goToSettings addTarget:self action:@selector(openSettings) forControlEvents:UIControlEventTouchUpInside];
+        goToSettings.center = noInternetConnectionView.center;
+        [noInternetConnectionView addSubview:goToSettings];
     }
     else {
-       NSDate *date = [NSDate date];
-       lastUpdated = [formatter stringFromDate:date];
+        label.center = noInternetConnectionView.center;
     }
-    return lastUpdated;
+     */
+    label.center = noInternetConnectionView.center;
+    [self.navigationController.view insertSubview:noInternetConnectionView belowSubview:self.navigationController.navigationBar];
 }
 
-- (void)setLastUpdatedDate:(NSDate *)date
+- (void)openSettings
 {
-     NSString *lastUpdated = [formatter stringFromDate:date];
-    [[NSUserDefaults standardUserDefaults] setObject:lastUpdated forKey:keyLastUpdated];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+}
+
+- (NSMutableDictionary *)getLastUpdatedDateByCities
+{
+    NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
+    for (City *city in [[Settings sharedInstance] getSelectedCities]) {
+        NSMutableArray *array = [[NewsHelper sharedInstance].newsByCities objectForKey:city.city_id];
+        if (array.count > 0) {
+            NSDate *date = [[array firstObject] date];
+            NSDate *datePlusOneSecond = [date dateByAddingTimeInterval:1];
+            NSString *lastUpdated = [formatter stringFromDate:datePlusOneSecond];
+            [result setObject:lastUpdated forKey:city.city_id];
+        }
+    }
+    return result;
 }
 
 - (NSMutableArray *)getSelectedCities
@@ -113,22 +179,46 @@ NSString * const keyLastUpdated = @"lastUpdated";
     return [city city_id];
 }
 
+- (void)loadNews
+{
+    if ([[self.navigationController.view subviews] containsObject:noInternetConnectionView]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [noInternetConnectionView removeFromSuperview];
+        });
+    }
+    [self showActivityIndicator];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [apiManager loadNewsByCitiesAndPages:pagesByCities];
+    [self removeNotifications];
+}
+
 - (IBAction)refreshNews:(id)sender
 {
-    [apiManager loadAdditionalNewsByDateString:[self getLastUpdatedDateString]];
+    [apiManager loadAdditionalNewsByDatesAndCities:[self getLastUpdatedDateByCities]];
 }
 
 - (void)loadMoreNews
 {
+    NSLog(@"loadMoreNews");
     loadMoreButton.enabled = NO;
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
-    for (City *city in [self getSelectedCities]) {
-        int page = (int)[[pagesByCities objectForKey:city.city_id] integerValue];
-        page++;
-        [pagesByCities setObject:[NSNumber numberWithInt:page] forKey:city.city_id];
-    }
-    [apiManager loadNewsByCitiesAndPages:pagesByCities];
+//    if ([[NetworkManager sharedInstance] isConnectionAvailable] == YES) {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        for (City *city in [self getSelectedCities]) {
+            int page = (int)[[pagesByCities objectForKey:city.city_id] integerValue];
+            page++;
+            [pagesByCities setObject:[NSNumber numberWithInt:page] forKey:city.city_id];
+        }
+        [apiManager loadNewsByCitiesAndPages:pagesByCities];
+//    }
+//    else {
+//        [[NSNotificationCenter defaultCenter] addObserver:self
+//                                                 selector:@selector(loadMoreNews)
+//                                                     name:kConnectionIsAvailableNotificationName
+//                                                   object:nil];
+//        [self addNoInternetConnectionView];
+//    }
 }
 
 - (UIColor *)lighterColorForColor:(UIColor *)c
@@ -142,42 +232,16 @@ NSString * const keyLastUpdated = @"lastUpdated";
     return nil;
 }
 
-/*
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{
-    if(self.tableView.indexPathsForVisibleRows.count > 0) {
-        CGPoint offset = scrollView.contentOffset;
-        CGRect bounds = scrollView.bounds;
-        CGSize size = scrollView.contentSize;
-        UIEdgeInsets inset = scrollView.contentInset;
-        float y = offset.y + bounds.size.height - inset.bottom;
-        float h = size.height;
-        
-        float reload_distance = 50;
-        if(y > h + reload_distance) {
-            self.tableView.tableFooterView.hidden = NO;
-            NSLog(@"load more rows");
-        }
-    }
-    
- 
-    if(self.tableView.indexPathsForVisibleRows.count > 0) {
-        NSInteger currentOffset = scrollView.contentOffset.y;
-        NSInteger maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
-        if (maximumOffset - currentOffset <= -20) {
-            self.tableView.tableFooterView.hidden = NO;
-            NSLog(@"show footer");
-        }
-    }
-}
-*/
-
 #pragma mark - ApiManagerDelegate
 
 - (void)didReceiveNews:(NSMutableArray *)receivedNews
 {
+    NSLog(@"didReceiveNews");
     dispatch_async(dispatch_get_main_queue(), ^{
         loadMoreButton.enabled = YES;
+        if ([[self.navigationController.view subviews] containsObject:noInternetConnectionView]) {
+            [noInternetConnectionView removeFromSuperview];
+        }
     });
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
@@ -189,13 +253,15 @@ NSString * const keyLastUpdated = @"lastUpdated";
     dispatch_async(dispatch_get_main_queue(), ^{
         loadMoreButton.enabled = YES;
     });
+    
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [self hideActivityIndicator];
     NSLog(@"NewsTableViewController loadNewsDidFailWithError: %@", error);
 }
-
+     
 - (void)didNotReceiveAdditionalNews
 {
+    NSLog(@"didNotReceiveAdditionalNews");
     if ([self.refreshControl isRefreshing] == YES) {
         [self.refreshControl endRefreshing];
     }
@@ -203,19 +269,14 @@ NSString * const keyLastUpdated = @"lastUpdated";
 
 - (void)didReceiveAdditionalNews:(NSMutableArray *)receivedNews
 {
-    if ([self.refreshControl isRefreshing] == YES) {
-        [self.refreshControl endRefreshing];
-        /*
-        [NSTimer scheduledTimerWithTimeInterval:30.0
-                                         target:self
-                                       selector:@selector(hideColors)
-                                       userInfo:nil
-                                        repeats:NO];
-        */
-    }
-    [self setLastUpdatedDate:[NSDate date]];
-    
+    NSLog(@"didReceiveAdditionalNews");
     dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.refreshControl isRefreshing] == YES) {
+            [self.refreshControl endRefreshing];
+            
+            [indexPathsForResresh removeAllObjects];
+            [self performSelector:@selector(hideColors) withObject:nil afterDelay:180];
+        }
         NSMutableArray *indicesToAdd = [[NSMutableArray alloc] init];
         [self.tableView beginUpdates];
         for (int i = 0; i < receivedNews.count; i++) {
@@ -224,11 +285,13 @@ NSString * const keyLastUpdated = @"lastUpdated";
             NSIndexPath *indexpath = [NSIndexPath indexPathForRow:i inSection:section];
             [indicesToAdd addObject: indexpath];
         }
+        [indexPathsForResresh addObjectsFromArray:indicesToAdd];
         [self.tableView insertRowsAtIndexPaths:indicesToAdd withRowAnimation:UITableViewRowAnimationAutomatic];
         [self.tableView endUpdates];
         [self.tableView reloadData];
     });
 }
+
 
 - (void)hideColors
 {
@@ -236,10 +299,12 @@ NSString * const keyLastUpdated = @"lastUpdated";
     for (City *city in [Settings sharedInstance].allCities) {
         NSMutableArray *news = [[NewsHelper sharedInstance].newsByCities objectForKey:city.city_id];
         for (News *new in news) {
-            new.isNotRead = NO;
+            if (new.isNotRead == YES) {
+                new.isNotRead = NO;
+            }
         }
     }
-    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+    [self.tableView reloadRowsAtIndexPaths:indexPathsForResresh withRowAnimation:UITableViewRowAnimationNone];
 }
 
 #pragma mark - SettingsDelegate
@@ -273,8 +338,14 @@ NSString * const keyLastUpdated = @"lastUpdated";
 {
     NewsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"newsCell" forIndexPath:indexPath];
     News *cellNew = [[self getNewsBySection:indexPath.section] objectAtIndex:indexPath.row];
-    //[cellNew addObserver:cell forKeyPath:@"isNotRead" options:NSKeyValueObservingOptionNew context:nil];
+    [cellNew addObserver:cell forKeyPath:@"isNotRead" options:NSKeyValueObservingOptionNew context:nil];
     [cell setCellData:cellNew];
+    if (cellNew.isNotRead == YES) {
+        cell.todayCellColorView.backgroundColor = Rgb2UIColor(134, 226, 213);
+    }
+    else {
+        cell.todayCellColorView.backgroundColor = [UIColor clearColor];
+    }
     return cell;
 }
 
@@ -282,7 +353,9 @@ NSString * const keyLastUpdated = @"lastUpdated";
 {
     NSMutableArray *data = [self getNewsBySection:indexPath.section];
     selectedNews = [data objectAtIndex:indexPath.row];
+    selectedNews.isNotRead = NO;
     [self performSegueWithIdentifier:@"showDetails" sender:nil];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section

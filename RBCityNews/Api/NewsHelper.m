@@ -89,6 +89,17 @@
     return result;
 }
 
+- (BOOL)hasNews
+{
+    for (City *city in [[Settings sharedInstance] getSelectedCities]) {
+        NSMutableArray *array = [_newsByCities objectForKey:city.city_id];
+        if (array.count > 0) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (BOOL)containsNews:(News *)news
 {
     if(news && news.news_id) {

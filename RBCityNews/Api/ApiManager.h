@@ -20,6 +20,7 @@
 - (void)loadAdditionalNewsByCitiesAndPages:(NSMutableDictionary *)pagesByCities;
 - (void)loadNewsByCity:(City *)city andPage:(int)page;
 - (void)loadAdditionalNewsByDateString:(NSString *)dateString;
+- (void)loadAdditionalNewsByDatesAndCities:(NSMutableDictionary *)datesByCities;
 
 @end
 

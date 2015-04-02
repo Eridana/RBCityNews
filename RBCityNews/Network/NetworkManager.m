@@ -8,8 +8,6 @@
 
 #import "NetworkManager.h"
 
-#define kConnectionIsAvailableNotificationName @"connectionIsAvailable"
-
 @interface NetworkManager ()
 {
     Reachability *reachability;
@@ -32,7 +30,6 @@
 {
     self = [super init];
     if (self) {
-        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(checkNetworkStatus:)
                                                      name:kReachabilityChangedNotification
@@ -46,13 +43,35 @@
 
 - (BOOL)isConnectionAvailable
 {
-    reachability = [Reachability reachabilityWithHostName:@"www.google.com"];
-    NetworkStatus internetStatus = [reachability currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    __block BOOL result = NO;
+    Reachability* reach = [Reachability reachabilityWithHostname:@"www.google.com"];
+    
+    // Set the blocks
+    reach.reachableBlock = ^(Reachability*reach)
     {
-        return NO;
-    }
-    return YES;
+        result = YES;
+        // keep in mind this is called on a background thread
+        // and if you are updating the UI it needs to happen
+        // on the main thread, like this:
+        
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            NSLog(@"REACHABLE!");
+//        });
+    };
+    
+    reach.unreachableBlock = ^(Reachability*reach)
+    {
+        result = NO;
+    };
+
+    return result;
+//    reachability = [Reachability reachabilityWithHostname:@"google.com"];
+//    NetworkStatus internetStatus = [reachability currentReachabilityStatus];
+//    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+//    {
+//        return NO;
+//    }
+//    return YES;
 }
 
 - (void)checkNetworkStatus:(NSNotification *)notification

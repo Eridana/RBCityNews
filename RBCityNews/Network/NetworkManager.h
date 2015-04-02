@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "Reachability.h"
 
+#define kConnectionIsAvailableNotificationName @"connectionIsAvailable"
+
 @interface NetworkManager : NSObject
 
 + (NetworkManager *)sharedInstance;

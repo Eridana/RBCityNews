@@ -17,6 +17,7 @@
 
 - (void)setNews:(NSArray *)news;
 - (void)setAdditionalNews:(NSArray *)news;
+- (BOOL)hasNews;
 - (NSArray *)getNewsByCity:(City *)city;
 - (BOOL) containsNews:(News *)news;
 - (void)sortNewsByDate;

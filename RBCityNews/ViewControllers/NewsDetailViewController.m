@@ -11,6 +11,7 @@
 #import "NewsHelper.h"
 #import "SVWebViewController.h"
 
+
 const CGFloat initialTitleViewHeight = 73;
 
 @interface NewsDetailViewController () {
@@ -33,6 +34,25 @@ const CGFloat initialTitleViewHeight = 73;
     [rightSwipeRecognizer setDirection:UISwipeGestureRecognizerDirectionRight];
     [[self view] addGestureRecognizer:rightSwipeRecognizer];
 }
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    if(displayNews == nil) {
+        displayNews = [[NSMutableArray alloc] init];
+        [displayNews addObjectsFromArray:[[NewsHelper sharedInstance].newsByCities objectForKey:_details.city.city_id]];
+        currentNewsIndex = [displayNews indexOfObject:_details];
+    }
+    [self updateDetails];
+}
+
+/*
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self updateDetails];
+}*/
 
 - (void) setDetails:(News *)details
 {
@@ -69,18 +89,6 @@ const CGFloat initialTitleViewHeight = 73;
    return ceil(rect.size.height);
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    if(displayNews == nil) {
-        displayNews = [[NSMutableArray alloc] init];
-        [displayNews addObjectsFromArray:[[NewsHelper sharedInstance].newsByCities objectForKey:_details.city.city_id]];
-        currentNewsIndex = [displayNews indexOfObject:_details];
-    }
-    
-    [self performSelectorOnMainThread:@selector(updateDetails)  withObject:nil waitUntilDone:YES];
-}
 
 - (IBAction)goToNew:(id)sender {
     if([_details.legacy_url description]) {

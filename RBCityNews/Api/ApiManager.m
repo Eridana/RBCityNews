@@ -111,8 +111,78 @@ static NSString * const apiSourceUrl = @"http://rbcitynews.ru/api/v1/cities/%@/n
     } // end of for
 }
 
+- (void)loadAdditionalNewsByDatesAndCities:(NSMutableDictionary *)datesByCities
+{
+    NSArray *cities = [[Settings sharedInstance] getSelectedCities];
+    for (City *city in cities) {
+        NSString *dateString = [datesByCities objectForKey:city.city_id];
+        if (dateString.length == 0) {
+            if ([_apiDelegate respondsToSelector:@selector(didNotReceiveAdditionalNews)]) {
+                NSLog(@"dateString is empty, no additional news for : %@", dateString);
+                [_apiDelegate didNotReceiveAdditionalNews];
+            }
+        }
+        NSLog(@"loadAdditionalNewsByDatesAndCities: city=%@, %@", city.name, dateString);
+        NSString *paramsUrl = [NSString stringWithFormat: @"http://rbcitynews.ru/api/v1/cities/%@/news.json?published_at_more='%@'", city.city_id, dateString];
+        paramsUrl = [paramsUrl stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+        paramsUrl = [paramsUrl stringByReplacingOccurrencesOfString:@"'" withString:@"%27"];
+        
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:paramsUrl]];
+        [request setHTTPMethod:@"GET"];
+        
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+        
+        [[session dataTaskWithRequest:request
+                    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                        if (error != nil) {
+                            // error
+                            NSLog(@"error %@", [error description]);
+                            [self loadNewsDidFailWithError:[error description]];
+                        }
+                        else {
+                            // parse results
+                            NSError *parsingError = nil;
+                            NSDictionary *response = [NSJSONSerialization JSONObjectWithData:data options:0 error:&parsingError];
+                            
+                            if (response == nil) {
+                                if ([_apiDelegate respondsToSelector:@selector(didNotReceiveAdditionalNews)]) {
+                                    NSLog(@"no additional news for : %@", dateString);
+                                    [_apiDelegate didNotReceiveAdditionalNews];
+                                }
+                            }
+                            else if (parsingError != nil) {
+                                [self loadNewsDidFailWithError:[parsingError description]];
+                            }
+                            
+                            else {
+                                NSMutableArray *news = [self parseNews:response];
+                                if (news.count > 0) {
+                                    for (News *new in news) {
+                                        new.isNotRead = YES;
+                                    }
+                                    [[NewsHelper sharedInstance] setAdditionalNews:news];
+                                    //                                    [[NewsHelper sharedInstance] sortNewsByDate];
+                                    if ([_apiDelegate respondsToSelector:@selector(didReceiveAdditionalNews:)]) {
+                                        NSLog(@"%ld additional news for : %@", news.count, dateString);
+                                        [_apiDelegate didReceiveAdditionalNews:news];
+                                    }
+                                }
+                                else {
+                                    if ([_apiDelegate respondsToSelector:@selector(didNotReceiveAdditionalNews)]) {
+                                        NSLog(@"no additional news for : %@", dateString);
+                                        [_apiDelegate didNotReceiveAdditionalNews];
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }] resume];
+    }
+}
+
 - (void)loadAdditionalNewsByDateString:(NSString *)dateString
 {
+    NSLog(@"loadAdditionalNewsByDateString: %@", dateString);
     NSArray *cities = [[Settings sharedInstance] getSelectedCities];
     for (City *city in cities) {
         NSString *paramsUrl = [NSString stringWithFormat: @"http://rbcitynews.ru/api/v1/cities/%@/news.json?published_at_more='%@'", city.city_id, dateString];
@@ -138,6 +208,7 @@ static NSString * const apiSourceUrl = @"http://rbcitynews.ru/api/v1/cities/%@/n
                             
                             if (response == nil) {
                                 if ([_apiDelegate respondsToSelector:@selector(didNotReceiveAdditionalNews)]) {
+                                     NSLog(@"no additional news for : %@", dateString);
                                     [_apiDelegate didNotReceiveAdditionalNews];
                                 }
                             }
@@ -152,13 +223,15 @@ static NSString * const apiSourceUrl = @"http://rbcitynews.ru/api/v1/cities/%@/n
                                         new.isNotRead = YES;
                                     }
                                     [[NewsHelper sharedInstance] setAdditionalNews:news];
-                                    [[NewsHelper sharedInstance] sortNewsByDate];
+//                                    [[NewsHelper sharedInstance] sortNewsByDate];
                                     if ([_apiDelegate respondsToSelector:@selector(didReceiveAdditionalNews:)]) {
+                                        NSLog(@"%ld additional news for : %@", news.count, dateString);
                                         [_apiDelegate didReceiveAdditionalNews:news];
                                     }
                                 }
                                 else {
                                     if ([_apiDelegate respondsToSelector:@selector(didNotReceiveAdditionalNews)]) {
+                                        NSLog(@"no additional news for : %@", dateString);
                                         [_apiDelegate didNotReceiveAdditionalNews];
                                     }
 
