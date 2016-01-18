@@ -43,6 +43,9 @@
 		3F23033E1AA0F8400084C5C6 /* settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F2303381AA0F8400084C5C6 /* settings@2x.png */; };
 		3F23034C1AA0F9180084C5C6 /* button_web.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F2303451AA0F9180084C5C6 /* button_web.png */; };
 		3F23034D1AA0F9180084C5C6 /* button_web@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F2303461AA0F9180084C5C6 /* button_web@2x.png */; };
+		3F3171741AE2B9B400E949C5 /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F3171731AE2B9B400E949C5 /* Images-2.xcassets */; };
+		3F3171781AE2BB1400E949C5 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F3171761AE2BB1400E949C5 /* Crashlytics.framework */; };
+		3F3171791AE2BB1400E949C5 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F3171771AE2BB1400E949C5 /* Fabric.framework */; };
 		3F6A160F1ACA7CC6006ED62C /* NetworkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A160C1ACA7CC6006ED62C /* NetworkManager.m */; };
 		3F6A16101ACA7CC6006ED62C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A160E1ACA7CC6006ED62C /* Reachability.m */; };
 		3F6A16131ACAAFA2006ED62C /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F6A16111ACAAFA2006ED62C /* NSString+HTML.m */; };
@@ -126,6 +129,9 @@
 		3F2303381AA0F8400084C5C6 /* settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settings@2x.png"; sourceTree = "<group>"; };
 		3F2303451AA0F9180084C5C6 /* button_web.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_web.png; sourceTree = "<group>"; };
 		3F2303461AA0F9180084C5C6 /* button_web@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button_web@2x.png"; sourceTree = "<group>"; };
+		3F3171731AE2B9B400E949C5 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Images-2.xcassets"; sourceTree = "<group>"; };
+		3F3171761AE2BB1400E949C5 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		3F3171771AE2BB1400E949C5 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		3F6A160B1ACA7CC6006ED62C /* NetworkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkManager.h; sourceTree = "<group>"; };
 		3F6A160C1ACA7CC6006ED62C /* NetworkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkManager.m; sourceTree = "<group>"; };
 		3F6A160D1ACA7CC6006ED62C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
@@ -153,6 +159,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F3171781AE2BB1400E949C5 /* Crashlytics.framework in Frameworks */,
+				3F3171791AE2BB1400E949C5 /* Fabric.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +226,8 @@
 		3F2302EA1AA0F38E0084C5C6 = {
 			isa = PBXGroup;
 			children = (
+				3F3171761AE2BB1400E949C5 /* Crashlytics.framework */,
+				3F3171771AE2BB1400E949C5 /* Fabric.framework */,
 				3F2302F51AA0F38E0084C5C6 /* RBCityNews */,
 				3F23030F1AA0F38E0084C5C6 /* RBCityNewsTests */,
 				3F2302F41AA0F38E0084C5C6 /* Products */,
@@ -249,6 +259,7 @@
 				3F2303261AA0F5930084C5C6 /* AppDelegate.h */,
 				3F2303321AA0F8400084C5C6 /* Images */,
 				3F2303271AA0F67E0084C5C6 /* Fonts */,
+				3F3171731AE2B9B400E949C5 /* Images-2.xcassets */,
 				3F2302F61AA0F38E0084C5C6 /* Supporting Files */,
 			);
 			path = RBCityNews;
@@ -381,6 +392,7 @@
 				3F2302EF1AA0F38E0084C5C6 /* Sources */,
 				3F2302F01AA0F38E0084C5C6 /* Frameworks */,
 				3F2302F11AA0F38E0084C5C6 /* Resources */,
+				3F3171751AE2BAB500E949C5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -463,6 +475,7 @@
 				3F2303391AA0F8400084C5C6 /* check.png in Resources */,
 				3F03E0C91AC577CA003769C3 /* SVWebViewControllerActivitySafari-iPad.png in Resources */,
 				3F2303021AA0F38E0084C5C6 /* Main.storyboard in Resources */,
+				3F3171741AE2B9B400E949C5 /* Images-2.xcassets in Resources */,
 				3F03E0C31AC577CA003769C3 /* SVWebViewController.bundle in Resources */,
 				3F2303301AA0F67E0084C5C6 /* Cuprum-Regular.ttf in Resources */,
 				3F23032D1AA0F67E0084C5C6 /* Cuprum-Bold.ttf in Resources */,
@@ -495,6 +508,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3F3171751AE2BAB500E949C5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Fabric.framework/run e07030f034d8ffb5a40bd3829be23a2c12ce56ec f4b7d12e1c5d3aebc896f5d44824c0261914dc779289e8d115288d121b9e0507";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3F2302EF1AA0F38E0084C5C6 /* Sources */ = {
@@ -618,6 +647,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "8c9d29dd-4270-4765-9f70-4b081e2ddd07";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -654,6 +684,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PROVISIONING_PROFILE = "8c9d29dd-4270-4765-9f70-4b081e2ddd07";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -664,12 +695,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Evgeniya Mikhaylova (P9E35A96ZD)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Evgeniya Mikhaylova (P9E35A96ZD)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = RBCityNews/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "8c9d29dd-4270-4765-9f70-4b081e2ddd07";
 			};
 			name = Debug;
 		};
@@ -677,12 +713,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Evgeniya Mikhaylova (P9E35A96ZD)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Evgeniya Mikhaylova (P9E35A96ZD)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = RBCityNews/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "8c9d29dd-4270-4765-9f70-4b081e2ddd07";
 			};
 			name = Release;
 		};

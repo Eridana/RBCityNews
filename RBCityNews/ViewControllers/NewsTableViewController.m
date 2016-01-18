@@ -276,7 +276,7 @@ NSString * const keyLastUpdated = @"lastUpdated";
             [self.refreshControl endRefreshing];
             
             [indexPathsForResresh removeAllObjects];
-            [self performSelector:@selector(hideColors) withObject:nil afterDelay:180];
+            //[self performSelector:@selector(hideColors) withObject:nil afterDelay:180];
         }
         NSMutableArray *indicesToAdd = [[NSMutableArray alloc] init];
         [self.tableView beginUpdates];

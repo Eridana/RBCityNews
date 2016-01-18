@@ -7,6 +7,9 @@
 //
 
 #import "AppDelegate.h"
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
+
 #define Rgb2UIColor(r, g, b)  [UIColor colorWithRed:((r) / 255.0) green:((g) / 255.0) blue:((b) / 255.0) alpha:1.0]
 
 @interface AppDelegate ()
@@ -22,7 +25,7 @@
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
     [[UISearchBar appearance] setBarTintColor:Rgb2UIColor(93, 185, 186)];
     [[UINavigationBar appearance] setTitleTextAttributes:@{ NSForegroundColorAttributeName : [UIColor whiteColor] }];
-    
+    [Fabric with:@[CrashlyticsKit]];
     return YES;
 }
 
